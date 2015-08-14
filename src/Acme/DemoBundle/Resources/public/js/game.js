@@ -4,6 +4,8 @@ app.controller('game', function($scope, $interval) {
 
     $scope.attacking = false;
     $scope.frame = 0;
+    $scope.countAlly = 0;
+    $scope.countEnemy = 0;
 
     var canvas  = document.getElementById("game"),
         ctx = canvas.getContext("2d"),
@@ -13,9 +15,9 @@ app.controller('game', function($scope, $interval) {
         enemy_did_dmg = [],
         ally_did_dmg = [],
         ally_start = {x: 6, y: 6},
-        enemy_start = {x: 1001, y: 6},
-        ally_formation = {column: 120, row: 120},
-        enemy_formation = {column: 120, row: 120},
+        enemy_start = {x: 1000, y: 6},
+        ally_formation = {column: 140, row: 145},
+        enemy_formation = {column: 140, row: 145},
         unit_width = 3,
         distance_x = 6,
         distance_y = 6,
@@ -45,7 +47,7 @@ app.controller('game', function($scope, $interval) {
 
     function initiate_variables() {
         if(isEven(enemy_start['x'])) {
-            forward = 4;
+
         }
     }
 
@@ -84,10 +86,13 @@ app.controller('game', function($scope, $interval) {
         clear_canvas();
         calculate_ally();
         calculate_enemy();
+        get_units();
     }
 
     function clear_canvas() {
         ctx.clearRect(0, 0, 1800, 900);
+        $scope.countAlly = 0;
+        $scope.countEnemy = 0;
     }
 
     function calculate_ally() {
@@ -105,7 +110,7 @@ app.controller('game', function($scope, $interval) {
                 var stopped    = check_forward(row, column, x, last, 'ally', is_stopped);
                 if(!stopped) x  = old_unit['x']+team;
                 if(stopped && column == last-1) {
-                    ally_did_dmg[row] = 2;
+                    ally_did_dmg[row] = Math.ceil(Math.random()*10);
                     hp = hp - enemy_did_dmg[row];
                 }
                 if(hp > 0) {
@@ -135,7 +140,7 @@ app.controller('game', function($scope, $interval) {
                 var stopped    = check_forward(row, column, x, last, 'enemy', is_stopped);
                 if(!stopped) x  = old_unit['x']+team;
                 if(stopped && column == 0) {
-                    enemy_did_dmg[row] = 2;
+                    enemy_did_dmg[row] = Math.ceil(Math.random()*10);
                     hp = hp - ally_did_dmg[row];
                 }
                 if(hp > 0) {
@@ -192,6 +197,19 @@ app.controller('game', function($scope, $interval) {
                 if (other_x === x + forward - a) return true;
             }
             return false;
+        }
+    }
+
+    function get_units() {
+        for(var a=0; a<ally.length; a++) {
+            for(var b=0; b<ally[a].length; b++) {
+                $scope.countAlly++;
+            }
+        }
+        for(a=0; a<enemy.length; a++) {
+            for(b=0; b<enemy[a].length; b++) {
+                $scope.countEnemy++;
+            }
         }
     }
 
