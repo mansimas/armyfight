@@ -56,7 +56,7 @@ app.controller('game', function($scope, $interval) {
             for (var column=0; column < ally_formation['column']; column++) {
                 var x = ally_start['x'] + column * distance_x;
                 var y = ally_start['y'] + row    * distance_y;
-                var unit = new Unit(id, x, y, 1, false, 50);
+                var unit = new Unit(id, x, y, 1, false, 300);
                 columns.push(unit);
                 id++;
             }
@@ -69,7 +69,7 @@ app.controller('game', function($scope, $interval) {
             for (column= 0; column < enemy_formation['column']; column++) {
                 x = enemy_start['x'] + column * distance_x;
                 y = enemy_start['y'] + row    * distance_y;
-                unit = new Unit(id, x, y, -1, false, 50);
+                unit = new Unit(id, x, y, -1, false, 300);
                 columns.push(unit);
                 id++;
             }
@@ -152,13 +152,26 @@ app.controller('game', function($scope, $interval) {
 
     function check_forward(row, column, x, last, team, is_stopped) {
         if(is_stopped) {
-            //if (team == 'ally') {
-            //    return ((column !== last-1 && ally[row][column+1]['x'] !== x+1) || (enemy[row][0]['x'] !== x+1));
-            //} else {
-            //    var alength = ally[row].length;
-            //    return ((column !== 0 && enemy[row][column-1]['x'] !== x-1) || (ally[row][alength-1]['x'] !== x-1));
-            //}
-            return true;
+            if (team == 'ally') {
+                if( column == last-1) {
+                    var enemy_row = enemy[row][0]['x'];
+                    if (check_forward_enemy(enemy_row, x, 'ally')) return true;
+                } else {
+                    var ally_row = ally[row][column+1]['x'];
+                    if (check_forward_enemy(ally_row, x, 'ally')) return true;
+                }
+                return false;
+            } else {
+                var alength = ally[row].length;
+                if( column == 0) {
+                    ally_row = ally[row][alength-1]['x'];
+                    if (check_forward_enemy(ally_row, x, 'enemy')) return true;
+                } else {
+                    enemy_row = enemy[row][column-1]['x'];
+                    if (check_forward_enemy(enemy_row, x, 'enemy')) return true;
+                }
+                return false;
+            }
         }
         if (team == 'ally') {
             return ((column !== last-1 && ally[row][column+1]['x'] === x+forward) || (enemy[row][0]['x'] === x+forward));
@@ -167,6 +180,21 @@ app.controller('game', function($scope, $interval) {
             return ((column !== 0 && enemy[row][column-1]['x'] === x-forward) || (ally[row][alength-1]['x'] === x-forward));
         }
     }
+
+    function check_forward_enemy(other_x, x, look) {
+        if(look == 'enemy') {
+            for (var a = 0; a < 5; a++) {
+                if (other_x === x - forward + a) return true;
+            }
+            return false;
+        } else if(look == 'ally') {
+            for (a = -4; a < 1; a++) {
+                if (other_x === x + forward - a) return true;
+            }
+            return false;
+        }
+    }
+
     function draw(x, y, color) {
         ctx.beginPath();
         ctx.fillStyle = color;
@@ -178,6 +206,7 @@ app.controller('game', function($scope, $interval) {
     }
 
     $scope.log = function() {
+        $scope.log1();
         $scope.log2();
     };
 
@@ -209,10 +238,10 @@ app.controller('game', function($scope, $interval) {
         ];
 
         var enemys = [enemy[0].length];
-        for(var a=0; a<50; a++) {
+        for(var a=0; a<5; a++) {
             enemys.push(enemy[0][a]['x'], enemy[0][a]['stopped']);
         }
-        console.log(enemys);
+        console.log(allys, enemys);
     };
 
     $scope.add_frame = function() {
