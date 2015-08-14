@@ -1,0 +1,13 @@
+_welcome:
+    path:     /
+    defaults: { _controller: AcmeDemoBundle:Game:index }
+
+play:
+    path:     /play
+    defaults: { _controller: AcmeDemoBundle:Game:play }
+list:
+    path:     /list
+    defaults: { _controller: AcmeDemoBundle:Game:list }
+make:
+    path:     /make
+    defaults: { _controller: AcmeDemoBundle:Game:make }

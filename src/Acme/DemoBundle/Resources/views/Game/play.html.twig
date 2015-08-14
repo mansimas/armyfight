@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div data-ng-app="app" data-ng-controller="game">
+
+        <canvas id="game" width="1800" height="900" class="game_canvas"></canvas>
+        <button data-ng-model="attacking" data-ng-click="attacking = !attacking">attack!</button>
+        <button data-ng-click="log()">log</button>
+        <button data-ng-bind="frame"></button>
+        <button data-ng-click="add_frame()">Add frame</button>
+
+    </div>
+
+{% endblock %}
