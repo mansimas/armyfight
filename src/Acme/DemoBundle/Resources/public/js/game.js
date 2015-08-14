@@ -56,7 +56,7 @@ app.controller('game', function($scope, $interval) {
             for (var column=0; column < ally_formation['column']; column++) {
                 var x = ally_start['x'] + column * distance_x;
                 var y = ally_start['y'] + row    * distance_y;
-                var unit = new Unit(id, x, y, 1, false, 300);
+                var unit = new Unit(id, x, y, 1, false, 50);
                 columns.push(unit);
                 id++;
             }
@@ -69,7 +69,7 @@ app.controller('game', function($scope, $interval) {
             for (column= 0; column < enemy_formation['column']; column++) {
                 x = enemy_start['x'] + column * distance_x;
                 y = enemy_start['y'] + row    * distance_y;
-                unit = new Unit(id, x, y, -1, false, 300);
+                unit = new Unit(id, x, y, -1, false, 50);
                 columns.push(unit);
                 id++;
             }
