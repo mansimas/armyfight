@@ -224,7 +224,6 @@ app.controller('game', function($scope, $interval) {
     }
 
     $scope.log = function() {
-        $scope.log1();
         $scope.log2();
     };
 
@@ -246,18 +245,14 @@ app.controller('game', function($scope, $interval) {
     };
 
     $scope.log2 = function() {
-        var length = ally[0].length;
-        var allys = [
-            'next',
-            ally[0][length-1]['x'], ally[0][length-1]['stopped'],
-            ally[0][length-2]['x'], ally[0][length-2]['stopped'],
-            ally[0][length-3]['x'], ally[0][length-3]['stopped'],
-            ally[0].length
-        ];
 
+        var allys = [ally[0].length];
+        for(var a=0; a<ally[0].length; a++) {
+            allys.push(ally[0][a]['x']);
+        }
         var enemys = [enemy[0].length];
-        for(var a=0; a<5; a++) {
-            enemys.push(enemy[0][a]['x'], enemy[0][a]['stopped']);
+        for(a=0; a<enemy[0].length; a++) {
+            enemys.push(enemy[0][a]['x']);
         }
         console.log(allys, enemys);
     };
