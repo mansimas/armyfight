@@ -16,13 +16,13 @@ app.controller('game', function($scope, $interval) {
         ally_did_dmg = [],
         ally_start = {x: 6, y: 6},
         enemy_start = {x: 1000, y: 6},
-        ally_formation = {column: 140, row: 145},
-        enemy_formation = {column: 140, row: 145},
+        ally_formation = {column: 100, row: 20},
+        enemy_formation = {column: 100, row: 40},
         unit_width = 3,
         distance_x = 6,
         distance_y = 6,
-        ally_length = 0,
-        enemy_length = 0,
+        ally_length = [],
+        enemy_length = [],
         forward = 4;
 
     function Unit(id, x, y, team, stopped, hp) {
@@ -64,6 +64,7 @@ app.controller('game', function($scope, $interval) {
             }
             ally[row] = columns;
             ally_did_dmg[row] = 0;
+            ally_length[row] = columns.length;
         }
         for(row=0; row < enemy_formation['row']; row++) {
             columns = [];
@@ -77,9 +78,26 @@ app.controller('game', function($scope, $interval) {
             }
             enemy[row] = columns;
             enemy_did_dmg[row] = 0;
+            enemy_length[row] = columns.length;
         }
-        ally_length = ally.length;
-        enemy_length = enemy.length;
+        check_for_same_rows();
+    }
+
+    function check_for_same_rows() {
+        if(ally.length > enemy.length) {
+            var difference = ally.length-enemy.length;
+            for (var d=0; d<difference; d++) {
+                enemy[enemy.length+d] = [];
+                enemy_length[enemy.length+d] = 0;
+            }
+        }
+        if(ally.length < enemy.length) {
+            difference = enemy.length-ally.length;
+            for (d=0; d<difference; d++) {
+                ally[ally.length+d] = [];
+                ally_length[ally.length+d] = 0;
+            }
+        }
     }
 
     function animate() {
@@ -97,62 +115,66 @@ app.controller('game', function($scope, $interval) {
 
     function calculate_ally() {
         var new_positions = [];
-        for (var row = 0; row < ally_length; row++) {
-            var last = ally[row].length;
+        for (var row = 0; row < ally.length; row++) {
+            var last = ally_length[row];
             var columns = [];
-            for (var column = 0; column < last; column++) {
-                var old_unit = ally[row][column];
-                var y          = old_unit['y'];
-                var team       = old_unit['team'];
-                var is_stopped = old_unit['stopped'];
-                var x          = old_unit['x'];
-                var hp         = old_unit['hp'];
-                var stopped    = check_forward(row, column, x, last, 'ally', is_stopped);
-                if(!stopped) x  = old_unit['x']+team;
-                if(stopped && column == last-1) {
-                    ally_did_dmg[row] = Math.ceil(Math.random()*10);
-                    hp = hp - enemy_did_dmg[row];
-                }
-                if(hp > 0) {
-                    var unit = new Unit(column, parseInt(x), y, team, stopped, hp);
-                    draw(x, y, 'red');
-                    columns.push(unit);
+            if(last > 0) {
+                for (var column = 0; column < last; column++) {
+                    var old_unit = ally[row][column];
+                    var y          = old_unit['y'];
+                    var team       = old_unit['team'];
+                    var is_stopped = old_unit['stopped'];
+                    var x          = old_unit['x'];
+                    var hp         = old_unit['hp'];
+                    var stopped    = check_forward(row, column, x, last, 'ally', is_stopped);
+                    if(!stopped) x  = old_unit['x']+team;
+                    if(stopped && column == last-1) {
+                        ally_did_dmg[row] = Math.ceil(Math.random()*10);
+                        hp = hp - enemy_did_dmg[row];
+                    }
+                    if(hp > 0) {
+                        var unit = new Unit(column, parseInt(x), y, team, stopped, hp);
+                        draw(x, y, 'red');
+                        columns.push(unit);
+                    }
                 }
             }
             new_positions[row] = columns;
+            ally_length[row] = columns.length;
         }
         ally = new_positions;
-        ally_length = ally.length;
     }
 
     function calculate_enemy() {
         var new_positions = [];
-        for (var row = 0; row < enemy_length; row++) {
-            var last = enemy[row].length;
+        for (var row = 0; row < enemy.length; row++) {
+            var last = enemy_length[row];
             var columns = [];
-            for (var column = last-1; column >=0; column--) {
-                var old_unit = enemy[row][column];
-                var y          = old_unit['y'];
-                var team       = old_unit['team'];
-                var is_stopped = old_unit['stopped'];
-                var x          = old_unit['x'];
-                var hp         = old_unit['hp'];
-                var stopped    = check_forward(row, column, x, last, 'enemy', is_stopped);
-                if(!stopped) x  = old_unit['x']+team;
-                if(stopped && column == 0) {
-                    enemy_did_dmg[row] = Math.ceil(Math.random()*10);
-                    hp = hp - ally_did_dmg[row];
-                }
-                if(hp > 0) {
-                    var unit = new Unit(column, parseInt(x), y, team, stopped, hp);
-                    draw(x, y, 'blue');
-                    columns.unshift(unit);
+            if(last > 0) {
+                for (var column = last-1; column >=0; column--) {
+                    var old_unit = enemy[row][column];
+                    var y          = old_unit['y'];
+                    var team       = old_unit['team'];
+                    var is_stopped = old_unit['stopped'];
+                    var x          = old_unit['x'];
+                    var hp         = old_unit['hp'];
+                    var stopped    = check_forward(row, column, x, last, 'enemy', is_stopped);
+                    if(!stopped) x  = old_unit['x']+team;
+                    if(stopped && column == 0) {
+                        enemy_did_dmg[row] = Math.ceil(Math.random()*10);
+                        hp = hp - ally_did_dmg[row];
+                    }
+                    if(hp > 0) {
+                        var unit = new Unit(column, parseInt(x), y, team, stopped, hp);
+                        draw(x, y, 'blue');
+                        columns.unshift(unit);
+                    }
                 }
             }
             new_positions[row] = columns;
+            enemy_length[row] = columns.length;
         }
         enemy = new_positions;
-        enemy_length = enemy.length;
     }
 
     function check_forward(row, column, x, last, team, is_stopped) {
@@ -222,6 +244,7 @@ app.controller('game', function($scope, $interval) {
     }
 
     $scope.log = function() {
+        $scope.log1();
         $scope.log2();
     };
 
