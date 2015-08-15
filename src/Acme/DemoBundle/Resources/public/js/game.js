@@ -16,11 +16,11 @@ app.controller('game', function($scope, $interval) {
         ally_did_dmg = [],
         ally_start = {x: 6, y: 6},
         enemy_start = {x: 1000, y: 6},
-        ally_formation = {column: 60, row: 20},
-        enemy_formation = {column: 30, row: 40},
+        ally_formation = {column: 140, row: 220},
+        enemy_formation = {column: 140, row: 220},
         unit_width = 3,
         distance_x = 6,
-        distance_y = 6,
+        distance_y = 4,
         ally_length = [],
         enemy_length = [],
         forward = 4;
@@ -35,7 +35,6 @@ app.controller('game', function($scope, $interval) {
     }
 
     function start_animation_loop() {
-        initiate_variables();
         initiate_units();
         $scope.promise = $interval(function() {
             if($scope.attacking == true) {
@@ -43,12 +42,6 @@ app.controller('game', function($scope, $interval) {
                 $scope.frame++;
             }
         }, 40 );
-    }
-
-    function initiate_variables() {
-        if(isEven(enemy_start['x'])) {
-
-        }
     }
 
     function initiate_units() {
@@ -239,43 +232,7 @@ app.controller('game', function($scope, $interval) {
         ctx.fillRect(x, y, unit_width, unit_width);
     }
 
-    function isEven(value) {
-        return value % 2 == 0;
-    }
-
     $scope.log = function() {
-        $scope.log1();
-        $scope.log2();
-    };
-
-    $scope.log1 = function() {
-        var length = ally[0].length;
-        var allys = [
-            ally[0][length-1]['x'], ally[0][length-1]['stopped'],
-            ally[0][length-2]['x'], ally[0][length-2]['stopped'],
-            ally[0][length-3]['x'], ally[0][length-3]['stopped'],
-            ally[0].length
-        ];
-        var enemys = [
-            enemy[0][0]['x'], enemy[0][0]['stopped'],
-            enemy[0][1]['x'], enemy[0][1]['stopped'],
-            enemy[0][2]['x'], enemy[0][2]['stopped'],
-            enemy[0].length
-        ];
-        console.log(allys, enemys);
-    };
-
-    $scope.log2 = function() {
-
-        var allys = [ally[0].length];
-        for(var a=0; a<ally[0].length; a++) {
-            allys.push(ally[0][a]['x']);
-        }
-        var enemys = [enemy[0].length];
-        for(a=0; a<enemy[0].length; a++) {
-            enemys.push(enemy[0][a]['x']);
-        }
-        console.log(allys, enemys);
     };
 
     $scope.add_frame = function() {
@@ -284,5 +241,4 @@ app.controller('game', function($scope, $interval) {
     };
 
     start_animation_loop();
-
 });
