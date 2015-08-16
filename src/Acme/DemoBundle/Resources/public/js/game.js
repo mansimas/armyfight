@@ -23,12 +23,66 @@ app.controller('game', function($scope, $interval) {
         distance_y = 4,
         forward = 4;
 
-    function Unit(id, x, team, stopped, hp) {
-        this.id = id;
+    function Ally(x, y, stopped, hp) {
         this.x = x;
-        this.team = team;
+        this.y = y;
+        this.team = 1;
         this.stopped = stopped;
         this.hp = hp;
+        this.check_forward = function(is_at_front, column) {
+            if(this.stopped) {
+                if (_.has(enemy, this.y) && enemy[this.y].length > 0) {
+                    if (is_at_front) {
+                        var enemy_row = enemy[this.y][0]['x'];
+                        if (enemy_row === this.x + forward) return true;
+                    } else {
+                        var ally_row = ally[this.y][column + 1]['x'];
+                        if (ally_row === this.x + forward) return true;
+                    }
+                    return false;
+                }
+            }
+            if(_.has(enemy, this.y) && enemy[this.y].length > 0) {
+                return (
+                (!is_at_front && ally[this.y][column+1]['x'] === this.x+forward) ||
+                (enemy[this.y][0]['x'] === this.x+forward)
+                );
+            } else {
+                return false;
+            }
+        }
+    }
+
+    function Enemy(x, y, stopped, hp) {
+        this.x = x;
+        this.y = y;
+        this.team = -1;
+        this.stopped = stopped;
+        this.hp = hp;
+        this.check_forward = function(is_at_front, column) {
+            if(this.stopped) {
+                if (_.has(ally, this.y) && ally[this.y].length > 0) {
+                    var alength = ally[this.y].length;
+                    if (is_at_front) {
+                        var ally_row = ally[this.y][alength-1]['x'];
+                        if (ally_row === this.x - forward) return true;
+                    } else {
+                        var enemy_row = enemy[this.y][column - 1]['x'];
+                        if (enemy_row === this.x - forward) return true;
+                    }
+                    return false;
+                }
+            }
+            if(_.has(ally, this.y) && ally[this.y].length > 0) {
+                alength = ally[this.y].length;
+                return (
+                (!is_at_front && enemy[this.y][column-1]['x'] === this.x-forward) ||
+                (ally[this.y][alength-1]['x'] === this.x-forward)
+                );
+            } else {
+                return false;
+            }
+        }
     }
 
     function start_animation_loop() {
@@ -44,24 +98,20 @@ app.controller('game', function($scope, $interval) {
     function initiate_units() {
         for(var y = ally_start['y']; y < ally_formation['row'] + ally_start['y']; y++) {
             var columns = [];
-            var id = 0;
             for (var column=0; column < ally_formation['column']; column++) {
                 var x = ally_start['x'] + column * distance_x;
-                var unit = new Unit(id, x, 1, false, 50);
+                var unit = new Ally(x, y, false, 50);
                 columns.push(unit);
-                id++;
             }
             ally[y] = columns;
             ally_did_dmg[y] = 0;
         }
         for( y = enemy_start['y']; y < enemy_formation['row'] + enemy_start['y']; y++) {
             columns = [];
-            id = 0;
             for (column= 0; column < enemy_formation['column']; column++) {
                 x = enemy_start['x'] + column * distance_x;
-                unit = new Unit(id, x, -1, false, 50);
+                unit = new Enemy(x, y, false, 50);
                 columns.push(unit);
-                id++;
             }
             enemy[y] = columns;
             enemy_did_dmg[y] = 0;
@@ -89,17 +139,16 @@ app.controller('game', function($scope, $interval) {
             for (var column = 0; column < last; column++) {
                 var old_unit = ally[key][column];
                 var team       = old_unit['team'];
-                var is_stopped = old_unit['stopped'];
                 var x          = old_unit['x'];
                 var hp         = old_unit['hp'];
-                var stopped    = check_forward(key, column, x, last, 'ally', is_stopped);
+                var stopped    = old_unit.check_forward(column == last-1, column);
                 if(!stopped) x  = old_unit['x'] + team;
                 if(stopped && column == last-1) {
                     ally_did_dmg[key] = Math.ceil(Math.random()*10);
                     hp = hp - enemy_did_dmg[key];
                 }
                 if(hp > 0) {
-                    var unit = new Unit(column, x, team, stopped, hp);
+                    var unit = new Ally(x, key, stopped, hp);
                     draw(x, key, 'red');
                     columns.push(unit);
                 }
@@ -117,17 +166,16 @@ app.controller('game', function($scope, $interval) {
             for (var column = last-1; column >=0; column--) {
                 var old_unit = enemy[key][column];
                 var team       = old_unit['team'];
-                var is_stopped = old_unit['stopped'];
                 var x          = old_unit['x'];
                 var hp         = old_unit['hp'];
-                var stopped    = check_forward(key, column, x, last, 'enemy', is_stopped);
+                var stopped    = old_unit.check_forward(column == 0, column);
                 if(!stopped) x  = old_unit['x']+team;
                 if(stopped && column == 0) {
                     enemy_did_dmg[key] = Math.ceil(Math.random()*10);
                     hp = hp - ally_did_dmg[key];
                 }
                 if(hp > 0) {
-                    var unit = new Unit(column, x, team, stopped, hp);
+                    var unit = new Enemy(x, key, stopped, hp);
                     draw(x, key, 'blue');
                     columns.unshift(unit);
                 }
@@ -135,49 +183,6 @@ app.controller('game', function($scope, $interval) {
             new_positions[key] = columns;
         });
         enemy = new_positions;
-    }
-
-    function check_forward(y, column, x, last, team, is_stopped) {
-        if(is_stopped) {
-            if (team == 'ally') {
-                if(_.has(enemy, y) && enemy[y].length > 0) {
-                    if( column == last-1) {
-                        var enemy_row = enemy[y][0]['x'];
-                        if (enemy_row === x + forward) return true;
-                    } else {
-                        var ally_row = ally[y][column+1]['x'];
-                        if (ally_row === x + forward) return true;
-                    }
-                }
-                return false;
-            } else {
-                if (_.has(ally, y) && ally[y].length > 0) {
-                    var alength = ally[y].length;
-                    if( column == 0) {
-                        ally_row = ally[y][alength-1]['x'];
-                        if (ally_row === x - forward) return true;
-                    } else {
-                        enemy_row = enemy[y][column-1]['x'];
-                        if (enemy_row === x - forward) return true;
-                    }
-                }
-                return false;
-            }
-        }
-        if (team == 'ally') {
-            if(_.has(enemy, y) && enemy[y].length > 0) {
-                return ((column !== last-1 && ally[y][column+1]['x'] === x+forward) || (enemy[y][0]['x'] === x+forward));
-            }else {
-                return false;
-            }
-        } else {
-            if(_.has(ally, y) && ally[y].length > 0) {
-                alength = ally[y].length;
-                return ((column !== 0 && enemy[y][column-1]['x'] === x-forward) || (ally[y][alength-1]['x'] === x-forward));
-            } else {
-                return false;
-            }
-        }
     }
 
     function get_units() {
