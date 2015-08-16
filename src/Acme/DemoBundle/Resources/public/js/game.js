@@ -14,8 +14,8 @@ app.controller('game', function($scope, $interval) {
         enemy = {},
         ally_start = {x: 16, y: 8},
         enemy_start = {x: 20, y: 9},
-        ally_formation = {color: 'red', column: 8, row: 10, hp: 500},
-        enemy_formation = {color: 'blue', column: 12, row: 8, hp: 500},
+        ally_formation = {color: 'red', column: 16, row: 15, hp: 500},
+        enemy_formation = {color: 'blue', column: 19, row: 20, hp: 500},
         unit_width = 29,
         distance_x = 30,
         distance_y = 30;
