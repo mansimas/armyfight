@@ -12,13 +12,13 @@ app.controller('game', function($scope, $interval) {
 
         ally = {},
         enemy = {},
-        ally_start = {x: 16, y: 8},
-        enemy_start = {x: 20, y: 9},
-        ally_formation = {color: 'red', column: 16, row: 15, hp: 500},
-        enemy_formation = {color: 'blue', column: 19, row: 20, hp: 500},
-        unit_width = 29,
-        distance_x = 30,
-        distance_y = 30;
+        ally_start = {x: 40, y: 2},
+        enemy_start = {x: 45, y: 1},
+        ally_formation = {color: 'red', column: 200, row: 41, hp: 50},
+        enemy_formation = {color: 'blue', column: 170, row: 43, hp: 50},
+        unit_width = 19,
+        distance_x = 20,
+        distance_y = 20;
 
     function Ally(x, y, hp) {
         this.x = x;
