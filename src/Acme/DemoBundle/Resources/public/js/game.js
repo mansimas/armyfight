@@ -12,21 +12,28 @@ app.controller('game', function($scope, $interval) {
 
         ally = {},
         enemy = {},
-        ally_start = {x: 40, y: 2},
-        enemy_start = {x: 45, y: 1},
-        ally_formation = {color: 'red', column: 200, row: 41, hp: 50},
-        enemy_formation = {color: 'blue', column: 170, row: 43, hp: 50},
+        ally_formation = [
+            {color: 'red', column: 42, row: 5, hp: 50, x: 20, y: 1},
+            {color: 'red', column: 45, row: 22, hp: 50, x: 12, y: 7},
+            {color: 'red', column: 40, row: 12, hp: 50, x: 22, y: 31}
+        ],
+        enemy_formation = [
+            {color: 'blue', column: 50, row: 14, hp: 50, x: 60, y: 2},
+            {color: 'blue', column: 40, row: 8, hp: 50, x: 70, y: 16},
+            {color: 'blue', column: 40, row: 15, hp: 50, x: 60, y: 25},
+            {color: 'blue', column: 30, row: 2, hp: 50, x: 80, y: 41}
+        ],
         unit_width = 19,
         distance_x = 20,
         distance_y = 20;
 
-    function Ally(x, y, hp) {
+    function Ally(x, y, hp, color) {
         this.x = x;
         this.y = y;
         this.team = 1;
         this.stopped = false;
         this.hp = hp;
-        this.color = ally_formation['color'];
+        this.color = color;
         this.attacking = 0;
         this.damage = Math.ceil(Math.random()*10);
         this.survived = function() {
@@ -131,14 +138,14 @@ app.controller('game', function($scope, $interval) {
         }
     }
 
-    function Enemy(x, y, hp) {
+    function Enemy(x, y, hp, color) {
         this.x = x;
         this.y = y;
         this.team = -1;
         this.stopped = false;
         this.attacking = 0;
         this.hp = hp;
-        this.color = enemy_formation['color'];
+        this.color = color;
         this.damage = Math.ceil(Math.random()*10);
         this.survived = function() {
             if(this.hp <= 0) return false;
@@ -252,19 +259,24 @@ app.controller('game', function($scope, $interval) {
     }
 
     function initiate_units() {
-        for(var y = ally_start['y']; y < ally_formation['row'] + ally_start['y']; y++) {
-            var columns = {};
-            for (var x = ally_start['x']; x > -ally_formation['column'] + ally_start['x']; x--) {
-                columns[x*distance_x] = new Ally(x*distance_x, y, ally_formation['hp']);
+        for(var row = 0; row < ally_formation.length; row++) {
+            for(var y = ally_formation[row]['y']; y < ally_formation[row]['row'] + ally_formation[row]['y']; y++) {
+                var columns = {};
+                for (var x = ally_formation[row]['x']; x > -ally_formation[row]['column'] + ally_formation[row]['x']; x--) {
+                    columns[x*distance_x] = new Ally(x*distance_x, y, ally_formation[row]['hp'], ally_formation[row]['color']);
+                }
+                ally[y] = columns;
             }
-            ally[y] = columns;
         }
-        for( y = enemy_start['y']; y < enemy_formation['row'] + enemy_start['y']; y++) {
-            columns = {};
-            for (x = enemy_start['x']; x < enemy_formation['column'] + enemy_start['x']; x++) {
-                columns[x*distance_x] = new Enemy(x*distance_x, y, enemy_formation['hp']);
+
+        for(row = 0; row < enemy_formation.length; row++) {
+            for( y = enemy_formation[row]['y']; y < enemy_formation[row]['row'] + enemy_formation[row]['y']; y++) {
+                columns = {};
+                for (x = enemy_formation[row]['x']; x < enemy_formation[row]['column'] + enemy_formation[row]['x']; x++) {
+                    columns[x*distance_x] = new Enemy(x*distance_x, y, enemy_formation[row]['hp'], enemy_formation[row]['color']);
+                }
+                enemy[y] = columns;
             }
-            enemy[y] = columns;
         }
     }
 
