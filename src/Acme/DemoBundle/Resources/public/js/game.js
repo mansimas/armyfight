@@ -19,10 +19,10 @@ app.controller('game', function($scope, $interval) {
             {color: 'red', column: 300, row: 10, hp: 50, x: 170, y: 120}
         ],
         enemy_formation = [
-            {color: 'blue', column: 300, row: 10, hp: 50, x: 200, y: 1},
-            {color: 'blue', column: 300, row: 10, hp: 50, x: 200, y: 50},
-            {color: 'blue', column: 300, row: 10, hp: 50, x: 200, y: 90},
-            {color: 'blue', column: 300, row: 10, hp: 50, x: 200, y: 158}
+            {color: 'blue', column: 300, row: 10, hp: 50, x: 5, y: 1},
+            {color: 'blue', column: 300, row: 10, hp: 50, x: 50, y: 50},
+            {color: 'blue', column: 300, row: 10, hp: 50, x: 150, y: 90},
+            {color: 'blue', column: 300, row: 10, hp: 50, x: 100, y: 158}
         ],
         unit_width = 4,
         distance_x = 5,
