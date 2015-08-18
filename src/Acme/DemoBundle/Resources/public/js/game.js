@@ -13,28 +13,30 @@ app.controller('game', function($scope, $interval) {
         ally = {},
         enemy = {},
         ally_formation = [
-            {color: 'red', column: 42, row: 5, hp: 50, x: 20, y: 1},
-            {color: 'red', column: 45, row: 22, hp: 50, x: 12, y: 7},
-            {color: 'red', column: 40, row: 12, hp: 50, x: 22, y: 31}
+            {color: 'red', column: 300, row: 10, hp: 50, x: 170, y: 30},
+            {color: 'red', column: 300, row: 10, hp: 50, x: 170, y: 40},
+            {color: 'red', column: 300, row: 10, hp: 50, x: 170, y: 70},
+            {color: 'red', column: 300, row: 10, hp: 50, x: 170, y: 120}
         ],
         enemy_formation = [
-            {color: 'blue', column: 50, row: 14, hp: 50, x: 60, y: 2},
-            {color: 'blue', column: 40, row: 8, hp: 50, x: 70, y: 16},
-            {color: 'blue', column: 40, row: 15, hp: 50, x: 60, y: 25},
-            {color: 'blue', column: 30, row: 2, hp: 50, x: 80, y: 41}
+            {color: 'blue', column: 300, row: 10, hp: 50, x: 200, y: 1},
+            {color: 'blue', column: 300, row: 10, hp: 50, x: 200, y: 50},
+            {color: 'blue', column: 300, row: 10, hp: 50, x: 200, y: 90},
+            {color: 'blue', column: 300, row: 10, hp: 50, x: 200, y: 158}
         ],
-        unit_width = 19,
-        distance_x = 20,
-        distance_y = 20;
+        unit_width = 4,
+        distance_x = 5,
+        distance_y = 5;
 
     function Ally(x, y, hp, color) {
         this.x = x;
         this.y = y;
+        this.target = 0;
         this.team = 1;
         this.stopped = false;
         this.hp = hp;
         this.color = color;
-        this.attacking = 0;
+        this.attacking = '';
         this.damage = Math.ceil(Math.random()*10);
         this.survived = function() {
             if(this.hp <= 0) return false;
@@ -127,14 +129,6 @@ app.controller('game', function($scope, $interval) {
             ctx.beginPath();
             ctx.fillStyle = this.color;
             ctx.fillRect(this.x, this.y*distance_y, unit_width, unit_width);
-            ctx.fillStyle = 'black';
-            var y_text = this.y*distance_y + unit_width;
-            ctx.fillText(this.hp, this.x, y_text);
-            if(this.attacking != 0) {
-                var y_atk = this.y*distance_y + unit_width/2;
-                var x_atk = this.x + unit_width/2;
-                ctx.fillText(this.attacking, x_atk, y_atk);
-            }
         }
     }
 
@@ -143,9 +137,10 @@ app.controller('game', function($scope, $interval) {
         this.y = y;
         this.team = -1;
         this.stopped = false;
-        this.attacking = 0;
+        this.attacking = '';
         this.hp = hp;
         this.color = color;
+        this.target = 0;
         this.damage = Math.ceil(Math.random()*10);
         this.survived = function() {
             if(this.hp <= 0) return false;
@@ -237,14 +232,6 @@ app.controller('game', function($scope, $interval) {
             ctx.beginPath();
             ctx.fillStyle = this.color;
             ctx.fillRect(this.x, this.y*distance_y, unit_width, unit_width);
-            ctx.fillStyle = 'white';
-            var y_text = this.y*distance_y + unit_width;
-            ctx.fillText(this.hp, this.x, y_text);
-            if(this.attacking != 0) {
-                var y_atk = this.y*distance_y + unit_width/2;
-                var x_atk = this.x + unit_width/2;
-                ctx.fillText(this.attacking, x_atk, y_atk);
-            }
         }
     }
 
@@ -296,8 +283,14 @@ app.controller('game', function($scope, $interval) {
     function calculate_ally() {
         var new_positions = {};
         _.each(ally, function(val, y) {
-            _.each(val, function(unit) {
+            var closest_y = iterate_Y(y, enemy);
+            _.each(val, function(unit, x) {
                 if (unit.survived()) {
+                    if(unit['target'] == 0) {
+                        var target = iterate_X(closest_y, x, 'enemy');
+                        if(target == undefined) target = iterate_backwards_X(closest_y, x, 'enemy');
+                        unit['target'] = target;
+                    }
                     unit.draw();
                     if (!_.has(new_positions, unit['y'])) {
                         new_positions[unit['y']] = {};
@@ -314,8 +307,14 @@ app.controller('game', function($scope, $interval) {
     function calculate_enemy() {
         var new_positions = {};
         _.each(enemy, function(val, y) {
-            _.each(val, function(unit) {
+            var closest_y = iterate_Y(y, ally);
+            _.each(val, function(unit, x) {
                 if (unit.survived()) {
+                    if(unit['target'] == 0) {
+                        var target = iterate_X(closest_y, x, 'enemy');
+                        if(target == undefined) target = iterate_backwards_X(closest_y, x, 'enemy');
+                        unit['target'] = target;
+                    }
                     unit.draw();
                     if (!_.has(new_positions, unit['y'])) {
                         new_positions[unit['y']] = {};
@@ -329,14 +328,40 @@ app.controller('game', function($scope, $interval) {
         enemy = new_positions;
     }
 
+    function iterate_X(y, x, unit) {
+        if(unit == 'enemy') return _.find(enemy[y], function (val, key) { return key >= x });
+        if(unit == 'ally')  return _.find(ally[y],  function (val, key) { return key <= x });
+    }
+
+    function iterate_backwards_X(y, x, unit) {
+        if(unit == 'enemy') return _.find(enemy[y], function (val, key) { return key <= x });
+        if(unit == 'ally')  return _.find(ally[y],  function (val, key) { return key >= x });
+    }
+
+    function iterate_Y(y, unit) {
+        if(_.has(unit, y)) {
+            return y;
+        } else {
+            return iterate_recursively(y, unit);
+        }
+    }
+
+    function iterate_recursively(y, unit) {
+        for(var i = 1; i<1000; i++) {
+            if( _.has(unit, y+i) ) return y+i;
+            if( _.has(unit, y-i) ) return y-i;
+        }
+        return y;
+    }
+
     function get_units() {
-        _.each(ally, function(val, y) {
-            _.each(val, function(unit) {
+        _.each(ally, function(val) {
+            _.each(val, function() {
                 $scope.countAlly++;
             });
         });
-        _.each(enemy, function(val, y) {
-            _.each(val, function(unit) {
+        _.each(enemy, function(val) {
+            _.each(val, function() {
                 $scope.countEnemy++;
             });
         });
