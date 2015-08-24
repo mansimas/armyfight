@@ -15,10 +15,10 @@ app.controller('game', function($scope, $interval) {
         ally = {},
         enemy = {},
         ally_formation = [
-            {color: 'red', column: 200, row: 180, hp: 50, x: 150, y: 1}
+            {color: 'red', column: 100, row: 90, hp: 50, x: 150, y: 10}
         ],
         enemy_formation = [
-            {color: 'blue', column: 200, row: 180, hp: 50, x: 200, y: 1}
+            {color: 'blue', column: 100, row: 30, hp: 50, x: 200, y: 20}
         ],
         unit_width = 4,
         distance_x = 5,
@@ -95,42 +95,46 @@ app.controller('game', function($scope, $interval) {
         };
 
         this.check_for_ally = function() {
-            if(_.has(ally[this.y+1])) {
-                return ( !_.has(ally[this.y+1][this.x])   &&
-                    !_.has(ally[this.y+1][this.x-1]) &&
-                    !_.has(ally[this.y+1][this.x-2]) &&
-                    !_.has(ally[this.y+1][this.x-1]) &&
-                    !_.has(ally[this.y+1][this.x+2]));
+            if(_.has(ally, this.y+1)) {
+                return (
+                !_.has(ally[this.y+1], this.x)    &&
+                !_.has(ally[this.y+1], this.x-1 ) &&
+                !_.has(ally[this.y+1], this.x-2 ) &&
+                !_.has(ally[this.y+1], this.x-1 ) &&
+                !_.has(ally[this.y+1], this.x+2 ));
             } else return true;
         };
 
         this.check_for_enemy = function() {
-            if(_.has(enemy[this.y+1])) {
-                return ( !_.has(enemy[this.y+1][this.x])   &&
-                    !_.has(enemy[this.y+1][this.x-1]) &&
-                    !_.has(enemy[this.y+1][this.x-2]) &&
-                    !_.has(enemy[this.y+1][this.x-1]) &&
-                    !_.has(enemy[this.y+1][this.x+2]) );
+            if(_.has(enemy, this.y+1)) {
+                return (
+                !_.has(enemy[this.y+1], this.x )   &&
+                !_.has(enemy[this.y+1], this.x-1 ) &&
+                !_.has(enemy[this.y+1], this.x-2 ) &&
+                !_.has(enemy[this.y+1], this.x-1 ) &&
+                !_.has(enemy[this.y+1], this.x+2 ) );
             } else return true;
         };
 
         this.check_for_oppo_ally = function() {
-            if(_.has(ally[this.y-1])) {
-                return ( !_.has(ally[this.y-1][this.x])   &&
-                !_.has(ally[this.y-1][this.x-1]) &&
-                !_.has(ally[this.y-1][this.x-2]) &&
-                !_.has(ally[this.y-1][this.x-1]) &&
-                !_.has(ally[this.y-1][this.x+2]));
+            if(_.has(ally, this.y-1 )) {
+                return (
+                !_.has(ally[this.y-1], this.x )   &&
+                !_.has(ally[this.y-1], this.x-1 ) &&
+                !_.has(ally[this.y-1], this.x-2 ) &&
+                !_.has(ally[this.y-1], this.x-1 ) &&
+                !_.has(ally[this.y-1], this.x+2 ));
             } else return true;
         };
 
         this.check_for_oppo_enemy = function() {
-            if(_.has(enemy[this.y-1])) {
-                return ( !_.has(enemy[this.y-1][this.x])   &&
-                !_.has(enemy[this.y-1][this.x-1]) &&
-                !_.has(enemy[this.y-1][this.x-2]) &&
-                !_.has(enemy[this.y-1][this.x-1]) &&
-                !_.has(enemy[this.y-1][this.x+2]) );
+            if(_.has(enemy, this.y-1 )) {
+                return (
+                !_.has(enemy[this.y-1], this.x )   &&
+                !_.has(enemy[this.y-1], this.x-1 ) &&
+                !_.has(enemy[this.y-1], this.x-2 ) &&
+                !_.has(enemy[this.y-1], this.x-1 ) &&
+                !_.has(enemy[this.y-1], this.x+2 ) );
             } else return true;
         };
 
@@ -142,24 +146,20 @@ app.controller('game', function($scope, $interval) {
                 if(this.move_y != 0 ) {
                     if(this.move_y < distance_y) {
                         this.move_y ++;
-                        console.log(1);
                     } else {
                         this.move_y = 0;
-                        console.log(2);
                     }
                 } else if(this.target['y'] > this.y) {
                     if (this.check_for_enemy() && this.check_for_ally()) {
-                    //    console.log('for');
-                    //    this.y++;
-                    //    this.move_y ++;
-                    //    this.direction_y = 1;
+                        this.y++;
+                        this.move_y ++;
+                        this.direction_y = 1;
                     }
                 } else if(this.target['y'] < this.y) {
                     if (this.check_for_oppo_enemy() && this.check_for_oppo_ally()) {
-                        //console.log('oppo');
-                        //this.y--;
-                        //this.move_y ++;
-                        //this.direction_y = -1;
+                        this.y--;
+                        this.move_y ++;
+                        this.direction_y = -1;
                     }
                 }
             }
@@ -294,7 +294,7 @@ app.controller('game', function($scope, $interval) {
             _.each(val, function(unit, x) {
                 x = parseInt(x);
                 if (unit.survived()) {
-                    if(unit['target'] == 0 || unit['target'] == undefined) {
+                    if(unit['target'] == 0 || unit['target'] == undefined || (_.has(unit, 'target') && unit['target']['hp'] < 1) ) {
                         var target = iterate_X(closest_y, x, 'enemy');
                         if(target == undefined) target = iterate_backwards_X(closest_y, x, 'enemy');
                         unit['target'] = target;
