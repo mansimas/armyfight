@@ -15,10 +15,10 @@ app.controller('game', function($scope, $interval) {
         ally = {},
         enemy = {},
         ally_formation = [
-            {color: 'red',  dmg: 10, hp: 100, column: 15, row: 170, x: 150, y: 1 }
+            {color: 'red',  dmg: 10, hp: 100, column: 300, row: 170, x: 150, y: 1 }
         ],
         enemy_formation = [
-            {color: 'blue', dmg: 10, hp: 100, column: 15, row: 170, x: 170, y: 1 }
+            {color: 'blue', dmg: 10, hp: 100, column: 300, row: 170, x: 170, y: 1 }
         ],
         unit_width = 4,
         distance_x = 5,
