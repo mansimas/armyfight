@@ -15,10 +15,14 @@ app.controller('game', function($scope, $interval) {
         ally = {},
         enemy = {},
         ally_formation = [
-            {color: 'red',  dmg: 10, hp: 100, column: 300, row: 170, x: 150, y: 1 }
+            {color: 'red',  dmg: 10, hp: 100, column: 30, row: 20, x: 80, y: 1 },
+            {color: 'red',  dmg: 10, hp: 100, column: 60, row: 40, x: 80, y: 70 },
+            {color: 'red',  dmg: 10, hp: 100, column: 30, row: 20, x: 250, y: 140 }
         ],
         enemy_formation = [
-            {color: 'blue', dmg: 10, hp: 100, column: 300, row: 170, x: 170, y: 1 }
+            {color: 'blue', dmg: 10, hp: 100, column: 60, row: 40, x: 140, y: 1 },
+            {color: 'blue', dmg: 10, hp: 100, column: 30, row: 20, x: 140, y: 70 },
+            {color: 'blue', dmg: 10, hp: 100, column: 60, row: 40, x: 80, y: 140 }
         ],
         unit_width = 4,
         distance_x = 5,
@@ -51,18 +55,19 @@ app.controller('game', function($scope, $interval) {
             this.check_forward();
             return true;
         };
-        this.find_enemy = function() {
+        this.find_opponent = function() {
             var y_array = [0, 1, -1];
-            if(this.move_y != 0 ) return false;
             for(var yy = 0; yy < y_array.length; yy++) {
                 var target_y = this.y+y_array[yy];
                 var target_x = this.x+(this.team * distance_x);
                 if (_.has(enemy[target_y], target_x)) {
                     this.attacking = enemy[target_y][target_x];
+                    this.target = enemy[target_y][target_x];
                     this.stopped = true;
                     return true;
                 } else if (_.has(enemy[target_y], this.x)) {
                     this.attacking = enemy[target_y][this.x];
+                    this.target = enemy[target_y][this.x];
                     this.stopped = true;
                     return true;
                 }
@@ -73,77 +78,64 @@ app.controller('game', function($scope, $interval) {
         this.check_forward = function() {
             if (this.stopped) {
                 if (this.attacking == 0) {
-                    this.move_forward();
+                    this.try_moving();
                 } else {
-                    if(this.attacking['hp'] > 0) {
-                        this.attacking['hp'] -= this.damage;
-                        if(this.move_y != 0 && this.move_y < distance_y) this.move_y += 0.5;
-                    } else {
-                        this.attacking = 0;
-                        if(this.move_y != 0 && this.move_y < distance_y) this.move_y += 0.5;
-                    }
+                    this.attacking['hp'] > 0 ? this.attacking['hp'] -= this.damage : this.attacking = 0;
                 }
             } else {
-                if (!this.find_enemy()) {
-                    if (_.has(ally[this.y], this.x+(this.team * distance_x)) || _.has(ally[this.y], this.x+this.team+(this.team * distance_x))) {
-                        this.stopped = true;
-                        this.attacking = 0;
-                        if(this.move_y != 0 && this.move_y < distance_y) this.move_y += 0.5;
-                    } else {
-                        this.move_forward();
-                    }
+                if (!this.find_opponent()) {
+                    this.try_moving();
                 }
             }
         };
 
         this.check_around = function(sort) {
-            if(sort == 'plus') var y_array = [ 1 ];
-            else if(sort == 'minus') y_array = [ -1 ];
-            var success_count = true;
-            for(var yy = 0; yy<y_array.length; yy++) {
-                var target_y = this.y+y_array[yy];
-                for(var xx = ( -distance_x); xx < ( distance_x); xx++) {
-                    var target_x = this.x+xx;
-                    if (_.has(ally[target_y], target_x)) {
-                        success_count = false;
+            var target_y = this.y + sort;
+            if(this.target['x'] > this.x) {
+                for(var xx = -1; xx <= distance_x+1; xx++) {
+                    if (_.has(ally[target_y], this.x+xx)) {
+                        return false;
                     }
                 }
+            } else if (this.target['x'] < this.x) {
+                for(xx = -1; xx <= distance_x+1; xx++) {
+                    if (_.has(ally[target_y], this.x-xx)) {
+                        return false;
+                    }
+                }
+            } else {
+                if (_.has(ally[target_y], this.x)) {
+                    return false;
+                }
             }
-            return success_count;
+
+            return true;
         };
 
         this.move_forward = function() {
+            if(this.target['x'] > this.x) {
+                var opponent = this.x+(this.team * distance_x);
+                var opponent1 = this.x+(this.team * distance_x)+this.team;
+                if (!_.has(ally[this.y], opponent) && !_.has(ally[this.y], opponent1)) {
+                    this.x += this.team;
+                }
+            }
+            else if(this.target['x'] < this.x)  {
+                opponent = this.x-(this.team * distance_x);
+                opponent1 = this.x-(this.team * distance_x)-this.team;
+                if (!_.has(ally[this.y], opponent) && !_.has(ally[this.y], opponent1)) {
+                    this.x -= this.team;
+                }
+            } else {
+                this.attacking = this.target;
+                this.stopped = true;
+            }
+        };
+
+        this.try_moving = function() {
             this.stopped = false;
             this.attacking = 0;
             if (this.target && this.target['hp'] > 0) {
-                if(this.target['x'] > this.x) {
-                    var opponent = this.x+(this.team * distance_x);
-                    var opponent1 = this.x+(this.team * distance_x)+this.team;
-                    if (!_.has(ally[this.y], opponent) && !_.has(ally[this.y], opponent1)) {
-                        this.x += this.team;
-                    }
-                }
-                else if(this.target['x'] < this.x)  {
-                    opponent = this.x-(this.team * distance_x);
-                    opponent1 = this.x+(this.team * distance_x)+this.team;
-                    if (!_.has(ally[this.y], opponent) && !_.has(ally[this.y], opponent1)) {
-                        this.x -= this.team;
-                    }
-                } else if(this.target['x'] == this.x) {
-                    if(this.target['y'] > this.y) {
-                        if (!_.has(ally[this.y+1], this.x)) {
-                            if( !this.find_enemy ) {
-                            }
-                        }
-                    } else if(this.target['y'] < this.y) {
-                        if (!_.has(ally[this.y-1], this.x)) {
-                            if( !this.find_enemy ) {
-                            }
-                        }
-                    } else {
-                        this.attacking = this.target;
-                    }
-                }
                 if(this.move_y != 0 ) {
                     if(this.move_y < distance_y) {
                         this.move_y += 0.5 ;
@@ -151,21 +143,19 @@ app.controller('game', function($scope, $interval) {
                         this.move_y = 0;
                     }
                 } else if(this.target['y'] > this.y) {
-                    if (this.check_around('plus')) {
+                    if (this.check_around(1)) {
                         this.y++;
                         this.move_y += 0.5;
                         this.direction_y = 1;
                     }
                 } else if(this.target['y'] < this.y) {
-                    if (this.check_around('minus')) {
+                    if (this.check_around(-1)) {
                         this.y--;
                         this.move_y += 0.5;
                         this.direction_y = -1;
                     }
-                } else if(this.target['y'] == this.y && this.target['x'] == this.x) {
-                    this.attacking = this.target;
-                    this.stopped = true;
                 }
+                if (this.move_y == 0) this.move_forward();
             }
         };
 
@@ -200,17 +190,20 @@ app.controller('game', function($scope, $interval) {
             this.check_forward();
             return true;
         };
-        this.find_ally = function() {
+
+        this.find_opponent = function() {
             var y_array = [0, 1, -1];
-            for(var yy = 0; yy<y_array.length; yy++) {
+            for(var yy = 0; yy < y_array.length; yy++) {
                 var target_y = this.y+y_array[yy];
                 var target_x = this.x+(this.team * distance_x);
                 if (_.has(ally[target_y], target_x)) {
                     this.attacking = ally[target_y][target_x];
+                    this.target = ally[target_y][target_x];
                     this.stopped = true;
                     return true;
                 }  else if (_.has(ally[target_y], this.x)) {
                     this.attacking = ally[target_y][this.x];
+                    this.target = ally[target_y][this.x];
                     this.stopped = true;
                     return true;
                 }
@@ -221,78 +214,63 @@ app.controller('game', function($scope, $interval) {
         this.check_forward = function() {
             if (this.stopped) {
                 if (this.attacking == 0) {
-                    this.move_forward();
+                    this.try_moving();
                 } else {
-                    if (this.attacking['hp'] > 0) {
-                        this.attacking['hp'] -= this.damage;
-                    } else {
-                        this.attacking = 0;
-                    }
+                    this.attacking['hp'] > 0 ? this.attacking['hp'] -= this.damage : this.attacking = 0;
                 }
             } else {
-                if (!this.find_ally()) {
-                    if (_.has(enemy[this.y], this.x+(this.team * distance_x)) || _.has(enemy[this.y], this.x+this.team+(this.team * distance_x)) ) {
-                        this.stopped = true;
-                        this.attacking = 0;
-                    } else {
-                        this.move_forward();
-                    }
+                if (!this.find_opponent()) {
+                    this.try_moving();
                 }
             }
         };
 
         this.check_around = function(sort) {
-            if(sort == 'plus') var y_array = [ 1 ];
-            else if(sort == 'minus') y_array = [ -1 ];
-            var success_count = true;
-            for(var yy = 0; yy<y_array.length; yy++) {
-                var target_y = this.y+y_array[yy];
-                for(var xx = -distance_x; xx < distance_x; xx++) {
-                    var target_x = this.x+xx;
-                    if (_.has(ally[target_y], target_x)) {
-                        success_count = false;
+            var target_y = this.y + sort;
+            if(this.target['x'] > this.x) {
+                for(var xx = -1; xx <= distance_x+1; xx++) {
+                    if (_.has(enemy[target_y], this.x+xx)) {
+                        return false;
                     }
                 }
+            } else if (this.target['x'] < this.x) {
+                for(xx = -1; xx <= distance_x+1; xx++) {
+                    if (_.has(enemy[target_y], this.x-xx)) {
+                        return false;
+                    }
+                }
+            } else {
+                if (_.has(enemy[target_y], this.x)) {
+                    return false;
+                }
             }
-            return success_count;
+            return true;
         };
 
         this.move_forward = function() {
+            if(this.target['x'] < this.x) {
+                var opponent = this.x+(this.team * distance_x);
+                var opponent1 = this.x+(this.team * distance_x)+this.team;
+                if (!_.has(enemy[this.y], opponent) && !_.has(enemy[this.y], opponent1)) {
+                    this.x += this.team;
+                }
+            }
+            else if(this.target['x'] > this.x)  {
+                opponent = this.x-(this.team * distance_x);
+                opponent1 = this.x-(this.team * distance_x)-this.team;
+                if (!_.has(enemy[this.y], opponent) && !_.has(enemy[this.y], opponent1)) {
+                    this.x -= this.team;
+                }
+            } else {
+                this.attacking = this.target;
+                this.stopped = true;
+            }
+        };
+
+        this.try_moving = function() {
             this.stopped = false;
             this.attacking = 0;
             if (this.target && this.target['hp']>0) {
-                if(this.target['x'] < this.x) {
-                    var opponent = this.x+(this.team * distance_x);
-                    var opponent1 = this.x+(this.team * distance_x)+this.team;
-                    if (!_.has(enemy[this.y], opponent) && !_.has(enemy[this.y], opponent1)) {
-                        this.x += this.team;
-                    }
-                }
-                else if(this.target['x'] > this.x)  {
-                    opponent = this.x-(this.team * distance_x);
-                    opponent1 = this.x+(this.team * distance_x)+this.team;
-                    if (!_.has(enemy[this.y], opponent) && !_.has(enemy[this.y], opponent1)) {
-                        this.x -= this.team;
-                        var xx = this.x;
-                        if(_.find(ally[this.target['y']], function (v, x) { return parseInt(x) <= parseInt(xx) })) {
-                            this.target = iterate_X(this.target['y'], xx, 'ally');
-                        }
-                    }
-                } else if(this.target['x'] == this.x) {
-                    if (this.target['y'] > this.y) {
-                        if (!_.has(enemy[this.y + 1], this.x)) {
-                            if (!this.find_ally) {
-                            }
-                        }
-                    } else if (this.target['y'] < this.y) {
-                        if (!_.has(enemy[this.y - 1], this.x)) {
-                            if (!this.find_ally) {
-                            }
-                        }
-                    } else {
-                        this.attacking = this.target;
-                    }
-                }
                 if(this.move_y != 0 ) {
                     if(this.move_y < distance_y) {
                         this.move_y += 0.5 ;
@@ -300,21 +278,19 @@ app.controller('game', function($scope, $interval) {
                         this.move_y = 0;
                     }
                 } else if(this.target['y'] > this.y) {
-                    if (this.check_around('plus')) {
+                    if (this.check_around(1)) {
                         this.y++;
                         this.move_y += 0.5;
                         this.direction_y = 1;
                     }
                 } else if(this.target['y'] < this.y) {
-                    if (this.check_around('minus')) {
+                    if (this.check_around(-1)) {
                         this.y--;
                         this.move_y += 0.5;
                         this.direction_y = -1;
                     }
-                } else if(this.target['y'] == this.y && this.target['x'] == this.x) {
-                    this.attacking = this.target;
-                    this.stopped = true;
                 }
+                if (this.move_y == 0) this.move_forward();
             }
         };
 
