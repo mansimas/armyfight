@@ -2,7 +2,7 @@ var core = angular.module('core', ['units', 'iteration']);
 core.factory('core', ['units', 'iteration', function (Unit, Iteration) {
     'use strict';
 
-    function Core(ally_formation, enemy_formation, unit_width, distance_x, distance_y, ctx) {
+    function Core(ally_formation, enemy_formation, unit_width, distance_x, distance_y, ctx, randomnr) {
         this.y_ally = [];
         this.y_enemy = [];
         this.ally = {};
@@ -17,6 +17,7 @@ core.factory('core', ['units', 'iteration', function (Unit, Iteration) {
         this.countAlly = 0;
         this.countEnemy = 0;
         this.ctx = ctx;
+        this.randomnr = randomnr;
     }
 
     Core.prototype = new Iteration();
@@ -34,7 +35,9 @@ core.factory('core', ['units', 'iteration', function (Unit, Iteration) {
                         this.ally_formation[row]['color'],
                         1,
                         this.distance_x,
-                        this.distance_y
+                        this.distance_y,
+                        this.ally_formation[row]['dmg'],
+                        this.randomnr
                     );
                 }
                 this.ally[y] = columns;
@@ -52,7 +55,9 @@ core.factory('core', ['units', 'iteration', function (Unit, Iteration) {
                         this.enemy_formation[row]['color'],
                         -1,
                         this.distance_x,
-                        this.distance_y
+                        this.distance_y,
+                        this.enemy_formation[row]['dmg'],
+                        this.randomnr
                     );
                 }
                 this.enemy[y] = columns;

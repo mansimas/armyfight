@@ -18,11 +18,12 @@ controllers.controller('game', ['$scope', '$interval', 'core',
                 {color: 'blue', dmg: 10, hp: 100, column: 100, row: 170, x: 220, y: 1 },
                 {color: 'green', dmg: 30, hp: 300, column: 100, row: 30, x: 220, y: 100 }
             ],
+            randomnr = true,
             unit_width = 4,
             distance_x = 5,
             distance_y = 5;
 
-        var core = new Core( ally_formation, enemy_formation, unit_width, distance_x, distance_y, ctx );
+        var core = new Core( ally_formation, enemy_formation, unit_width, distance_x, distance_y, ctx, randomnr );
 
         function start_animation_loop() {
             core.initiate();
@@ -37,7 +38,6 @@ controllers.controller('game', ['$scope', '$interval', 'core',
         function animate() {
             clear_canvas();
             core.calculate_ally();
-            //core.calculate_enemy();
             $scope.countAlly = core.getCountAlly();
             $scope.countEnemy = core.getCountEnemy();
         }
