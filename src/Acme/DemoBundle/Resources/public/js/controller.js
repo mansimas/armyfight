@@ -1,4 +1,4 @@
-var controllers = angular.module('controllers', ['service']);
+var controllers = angular.module('controllers', ['core']);
 
 controllers.controller('game', ['$scope', '$interval', 'core',
     function($scope, $interval, Core) {
@@ -12,10 +12,11 @@ controllers.controller('game', ['$scope', '$interval', 'core',
         var canvas  = document.getElementById("game"),
             ctx = canvas.getContext("2d"),
             ally_formation = [
-                {color: 'red',  dmg: 10, hp: 100, column: 150, row: 150, x: 170, y: 1 }
+                {color: 'red',  dmg: 10, hp: 100, column: 140, row: 170, x: 170, y: 1 }
             ],
             enemy_formation = [
-                {color: 'blue', dmg: 10, hp: 100, column: 150, row: 150, x: 220, y: 1 }
+                {color: 'blue', dmg: 10, hp: 100, column: 100, row: 170, x: 220, y: 1 },
+                {color: 'green', dmg: 30, hp: 300, column: 100, row: 30, x: 220, y: 100 }
             ],
             unit_width = 4,
             distance_x = 5,
@@ -36,7 +37,7 @@ controllers.controller('game', ['$scope', '$interval', 'core',
         function animate() {
             clear_canvas();
             core.calculate_ally();
-            core.calculate_enemy();
+            //core.calculate_enemy();
             $scope.countAlly = core.getCountAlly();
             $scope.countEnemy = core.getCountEnemy();
         }

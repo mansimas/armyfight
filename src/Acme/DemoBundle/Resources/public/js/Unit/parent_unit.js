@@ -10,19 +10,13 @@ parent_unit.factory('parent_unit', function () {
         return true;
     };
 
-    Unit.prototype.setAlly = function(ally) {
+    Unit.prototype.setAllyEnemy = function(ally, enemy) {
         if(this.team == 1) {
             this.ally = ally;
-        } else {
-            this.enemy = ally;
-        }
-    };
-
-    Unit.prototype.setEnemy = function(enemy) {
-        if(this.team == 1) {
             this.enemy = enemy;
         } else {
             this.ally = enemy;
+            this.enemy = ally;
         }
     };
 
