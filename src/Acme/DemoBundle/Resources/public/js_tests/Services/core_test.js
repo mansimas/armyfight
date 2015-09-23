@@ -107,5 +107,35 @@ describe('Core test', function() {
         core.resetCounts();
         expect(core.getCountEnemy()).toEqual(0);
     });
+
+    it('tests initiate function to return correct ally with more units', function () {
+        var ally_formation =  [{color: 'red',  dmg: 10, hp: 100, column: 2, row: 2, x: 170, y: 1 }];
+        var core = new Core(ally_formation, enemy_formation, unit_width, distance_x, distance_y, ctx, randomnr);
+        expect(core.ally).toEqual( {} );
+        var mocked_unit  = new Unit(845, 1, ally_formation[0]['hp'], ally_formation[0]['color'], 1, distance_x, distance_y, ally_formation[0]['dmg'], randomnr);
+        var mocked_unit1 = new Unit(850, 1, ally_formation[0]['hp'], ally_formation[0]['color'], 1, distance_x, distance_y, ally_formation[0]['dmg'], randomnr);
+        var mocked_unit2 = new Unit(845, 2, ally_formation[0]['hp'], ally_formation[0]['color'], 1, distance_x, distance_y, ally_formation[0]['dmg'], randomnr);
+        var mocked_unit3 = new Unit(850, 2, ally_formation[0]['hp'], ally_formation[0]['color'], 1, distance_x, distance_y, ally_formation[0]['dmg'], randomnr);
+        core.initiate();
+        expect(core.ally).toEqual(
+            { 1: { 845: mocked_unit,  850: mocked_unit1 },
+              2: { 845: mocked_unit2, 850: mocked_unit3 }}
+        );
+    });
+
+    it('tests initiate function to return correct enemy with more units', function () {
+        var enemy_formation =  [{color: 'blue',  dmg: 10, hp: 100, column: 2, row: 2, x: 220, y: 1 }];
+        var core = new Core(ally_formation, enemy_formation, unit_width, distance_x, distance_y, ctx, randomnr);
+        expect(core.enemy).toEqual( {} );
+        var mocked_unit  = new Unit(1100, 1, enemy_formation[0]['hp'], enemy_formation[0]['color'], -1, distance_x, distance_y, enemy_formation[0]['dmg'], randomnr);
+        var mocked_unit1 = new Unit(1105, 1, enemy_formation[0]['hp'], enemy_formation[0]['color'], -1, distance_x, distance_y, enemy_formation[0]['dmg'], randomnr);
+        var mocked_unit2 = new Unit(1100, 2, enemy_formation[0]['hp'], enemy_formation[0]['color'], -1, distance_x, distance_y, enemy_formation[0]['dmg'], randomnr);
+        var mocked_unit3 = new Unit(1105, 2, enemy_formation[0]['hp'], enemy_formation[0]['color'], -1, distance_x, distance_y, enemy_formation[0]['dmg'], randomnr);
+        core.initiate();
+        expect(core.enemy).toEqual(
+            { 1: { 1100: mocked_unit,  1105: mocked_unit1 },
+              2: { 1100: mocked_unit2, 1105: mocked_unit3 }}
+        );
+    });
 });
 

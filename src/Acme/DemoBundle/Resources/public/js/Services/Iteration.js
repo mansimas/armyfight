@@ -6,7 +6,7 @@ iteration.factory('iteration', ['helper', function (Helper) {
 
     Iteration.prototype = new Helper();
 
-    Iteration.prototype.calculate_ally = function() {
+    Iteration.prototype.calculate_units = function() {
 
         var self = this;
         var new_positions = { ally: [],        enemy: []         };
