@@ -56,7 +56,7 @@ helper.factory('helper', function () {
                 if (_.has(this.enemy, y)) {
                     return y;
                 }
-                for (var i = 1; i < 1000; i++) {
+                for (var i = 1; i < 100; i++) {
                     i = parseInt(i);
                     if (_.has(this.enemy, parseInt(y) + i)) return y + i;
                     if (_.has(this.enemy, parseInt(y) - i)) return y - i;
@@ -77,10 +77,6 @@ helper.factory('helper', function () {
         } catch(err) {
             console.log('iterate_Y', err, y, units);
         }
-    };
-
-    Helper.prototype.isInArray = function(value, array) {
-        return array.indexOf(value) > -1;
     };
 
     return Helper;
