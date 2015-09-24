@@ -13,14 +13,17 @@ iteration.factory('iteration', ['helper', function (Helper) {
         var y_array =       { ally: [],        enemy: []         };
         var numbers =       { ally: 0,         enemy: 0          };
         var group =         { ally: self.ally, enemy: self.enemy };
+        var x_array =       { ally: [],        enemy: []         };
 
         _.each(['ally', 'enemy'], function(type) {
             _.each(group[type], function (val, y) {
                 y = parseInt(y);
-                y_array[type].push(y);
+                    y_array[type].push(y);
+                    x_array[type][y] =[];
                 var closest_y = self.iterate_Y(y, type);
                 _.each(val, function (unit, x) {
                     x = parseInt(x);
+                    x_array[type][y].unshift(x);
                     unit.setAllyEnemy(self.ally, self.enemy);
                     if (unit.survived()) {
                         numbers[type]++;
@@ -49,6 +52,8 @@ iteration.factory('iteration', ['helper', function (Helper) {
         this.enemy      = new_positions['enemy'];
         this.y_ally     = y_array['ally'];
         this.y_enemy    = y_array['enemy'];
+        this.x_ally     = x_array['ally'];
+        this.x_enemy    = x_array['enemy'];
         this.countAlly  = numbers['ally'];
         this.countEnemy = numbers['enemy'];
     };

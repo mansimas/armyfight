@@ -6,14 +6,25 @@ helper.factory('helper', function () {
 
     Helper.prototype.iterate_X = function(y, x, units) {
         y = String(y);
-        if(units == 'ally') return _.find(this.enemy[y], function (v, k) { return parseInt(k) >= x });
-        if(units == 'enemy')  return _.find(this.ally[y],  function (v, k) { return parseInt(k) <= x });
+        var self = this;
+        if(units == 'ally')  return _.find(self.enemy[y], function (v, k) { return parseInt(k) >= x });
+        if(units == 'enemy') {
+            var selected;
+            for(var i=0; i<self.x_ally[y].length; i++) {
+                if(self.x_ally[y][i] <= x) {
+                    var found = self.x_ally[y][i];
+                    selected = self.ally[y][found];
+                    break;
+                }
+            }
+            return selected;
+        }
     };
 
     Helper.prototype.iterate_backwards_X = function(y, x, units) {
         y = String(y);
-        if(units == 'ally') return _.find(this.enemy[y], function (v, k) { return parseInt(k) <= x });
-        if(units == 'enemy')  return _.find(this.ally[y],  function (v, k) { return parseInt(k) >= x });
+        if(units == 'ally')  return _.find(this.enemy[y], function (v, k) { return parseInt(k) <= x });
+        if(units == 'enemy') return _.find(this.ally[y],  function (v, k) { return parseInt(k) >= x });
     };
 
     Helper.prototype.iterate_Y = function(y, units) {
