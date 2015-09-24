@@ -12,10 +12,10 @@ ctrl.controller('game', ['$scope', '$interval', 'core',
         var canvas  = document.getElementById("game"),
             ctx = canvas.getContext("2d"),
             ally_formation = [
-                {color: 'red',  dmg: 10, hp: 100, column: 3, row: 3, x: 100, y: 1 }
+                {color: 'red',  dmg: 10, hp: 100, column: 30, row: 30, x: 180, y: 1 }
             ],
             enemy_formation = [
-                {color: 'blue', dmg: 10, hp: 100, column: 3, row: 3, x: 120, y: 150 }
+                {color: 'blue', dmg: 10, hp: 100, column: 30, row: 30, x: 200, y: 1 }
             ],
             randomnr = true,
             unit_width = 4,

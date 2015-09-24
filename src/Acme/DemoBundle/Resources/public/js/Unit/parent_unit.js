@@ -66,7 +66,13 @@ parent_unit.factory('parent_unit', function () {
         for(var yy = 0; yy < y_array.length; yy++) {
             var target_y = this.y + y_array[yy];
             var target_x = this.x + (this.team * this.distance_x);
-            if (_.has(this.enemy[target_y], target_x)) {
+            var target_x1 = this.x + (this.team * this.distance_x)+this.team;
+            if (_.has(this.enemy[target_y], target_x1)) {
+                this.attacking = this.enemy[target_y][target_x1];
+                this.target = this.enemy[target_y][target_x1];
+                this.stopped = true;
+                return true;
+            } else if (_.has(this.enemy[target_y], target_x)) {
                 this.attacking = this.enemy[target_y][target_x];
                 this.target = this.enemy[target_y][target_x];
                 this.stopped = true;
@@ -81,16 +87,16 @@ parent_unit.factory('parent_unit', function () {
         return false;
     };
 
-    Unit.prototype.check_around = function(sort) {
-        var target_y = this.y + sort;
+    Unit.prototype.check_around = function(addition) {
+        var target_y = this.y + addition;
         if(this.target['x'] > this.x) {
-            for(var xx = -1; xx <= this.distance_x + 1; xx++) {
+            for(var xx = this.distance_x + 1; xx >= -1; xx--) {
                 if (_.has(this.ally[target_y], this.x+xx)) {
                     return false;
                 }
             }
         } else if (this.target['x'] < this.x) {
-            for(xx = -1; xx <= this.distance_x + 1; xx++) {
+            for(xx = this.distance_x + 1; xx >= -1; xx--) {
                 if (_.has(this.ally[target_y], this.x-xx)) {
                     return false;
                 }
@@ -114,7 +120,7 @@ parent_unit.factory('parent_unit', function () {
         }
         else if(this.target['x'] < this.x)  {
             opponent = this.x - this.distance_x;
-            opponent1 = this.x - this.distance_x - this.team;
+            opponent1 = this.x - this.distance_x - 1;
             if (!_.has(this.ally[this.y], opponent) && !_.has(this.ally[this.y], opponent1)) {
                 this.x -= 1;
             }
