@@ -84,7 +84,7 @@ core.factory('core', ['units', 'iteration', function (Unit, Iteration) {
     };
 
     Core.prototype.log = function() {
-        console.log(this.ally, this.enemy);
+        console.log(this.ally, this.enemy, this.y_ally, this.y_enemy );
     };
 
     return Core;

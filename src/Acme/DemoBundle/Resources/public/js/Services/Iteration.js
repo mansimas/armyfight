@@ -8,22 +8,19 @@ iteration.factory('iteration', ['helper', function (Helper) {
 
     Iteration.prototype.calculate_units = function() {
 
-        var self = this;
-        var new_positions = { ally: [],        enemy: []         };
+        var new_positions = { ally: {},        enemy: {}         };
         var y_array =       { ally: [],        enemy: []         };
         var numbers =       { ally: 0,         enemy: 0          };
-        var group =         { ally: self.ally, enemy: self.enemy };
+        var group =         { ally: this.ally, enemy: this.enemy };
         var x_array =       { ally: [],        enemy: []         };
+        var self = this;
 
         _.each(['ally', 'enemy'], function(type) {
             _.each(group[type], function (val, y) {
                 y = parseInt(y);
-                y_array[type].push(y);
-                x_array[type][y] =[];
                 var closest_y = self.iterate_Y(y, type);
                 _.each(val, function (unit, x) {
                     x = parseInt(x);
-                    x_array[type][y].unshift(x);
                     unit.setAllyEnemy(self.ally, self.enemy);
                     if (unit.survived()) {
                         numbers[type]++;
@@ -38,9 +35,13 @@ iteration.factory('iteration', ['helper', function (Helper) {
                         }
                         unit.draw(self.ctx, self.unit_width);
                         if (!_.has(new_positions[type], unit['y'])) {
+                            y_array[type].push(unit['y']);
+                            x_array[type][unit['y']] = [];
+                            x_array[type][unit['y']].unshift([unit['x']]);
                             new_positions[type][unit['y']] = {};
                             new_positions[type][unit['y']][unit['x']] = unit;
                         } else {
+                            x_array[type][unit['y']].unshift([unit['x']]);
                             new_positions[type][unit['y']][unit['x']] = unit;
                         }
                     }

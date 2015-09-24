@@ -1,6 +1,6 @@
-var controllers = angular.module('controllers', ['core']);
+var ctrl = angular.module('Ctrl', ['core']);
 
-controllers.controller('game', ['$scope', '$interval', 'core',
+ctrl.controller('game', ['$scope', '$interval', 'core',
     function($scope, $interval, Core) {
         "use strict";
 
@@ -12,10 +12,12 @@ controllers.controller('game', ['$scope', '$interval', 'core',
         var canvas  = document.getElementById("game"),
             ctx = canvas.getContext("2d"),
             ally_formation = [
-                {color: 'red',  dmg: 10, hp: 100, column: 3, row: 10, x: 200, y: 1 }
+                {color: 'red',  dmg: 10, hp: 100, column: 3, row: 3, x: 100, y: 3 },
+                {color: 'red',  dmg: 10, hp: 100, column: 3, row: 3, x: 100, y: 19 },
+                {color: 'red',  dmg: 10, hp: 100, column: 3, row: 3, x: 100, y: 40 }
             ],
             enemy_formation = [
-                {color: 'blue', dmg: 10, hp: 100, column: 3, row: 10, x: 100, y: 1 }
+                {color: 'blue', dmg: 10, hp: 100, column: 3, row: 10, x: 120, y: 8 }
             ],
             randomnr = true,
             unit_width = 4,
