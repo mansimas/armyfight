@@ -3,8 +3,6 @@ core.factory('core', ['units', 'iteration', function (Unit, Iteration) {
     'use strict';
 
     function Core(ally_formation, enemy_formation, unit_width, distance_x, distance_y, ctx, randomnr) {
-        this.y_ally = [];
-        this.y_enemy = [];
         this.x_ally = [];
         this.x_enemy = [];
         this.ally = {};
@@ -27,7 +25,6 @@ core.factory('core', ['units', 'iteration', function (Unit, Iteration) {
     Core.prototype.initiate = function() {
         for(var row = 0; row < this.ally_formation.length; row++) {
             for(var y = this.ally_formation[row]['y']; y < this.ally_formation[row]['row'] + this.ally_formation[row]['y']; y++) {
-                this.y_ally.push(y);
                 this.x_ally[y] = [];
                 var columns = {};
                 for (var x = this.ally_formation[row]['x']; x > -this.ally_formation[row]['column'] + this.ally_formation[row]['x']; x--) {
@@ -49,7 +46,6 @@ core.factory('core', ['units', 'iteration', function (Unit, Iteration) {
         }
         for(row = 0; row < this.enemy_formation.length; row++) {
             for( y = this.enemy_formation[row]['y']; y < (this.enemy_formation[row]['row'] + this.enemy_formation[row]['y']); y++) {
-                this.y_enemy.push(y);
                 this.x_enemy[y] = [];
                 columns = {};
                 for (x = this.enemy_formation[row]['x']; x < this.enemy_formation[row]['column'] + this.enemy_formation[row]['x']; x++) {
@@ -84,7 +80,7 @@ core.factory('core', ['units', 'iteration', function (Unit, Iteration) {
     };
 
     Core.prototype.log = function() {
-        console.log(this.ally, this.enemy, this.y_ally, this.y_enemy );
+        console.log(this.ally, this.enemy, this.x_ally, this.x_enemy );
     };
 
     return Core;

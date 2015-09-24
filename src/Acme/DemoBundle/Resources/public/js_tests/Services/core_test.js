@@ -22,20 +22,6 @@ describe('Core test', function() {
         ctx = canvas.getContext("2d");
     }));
 
-    it('tests initiate function to return correct y_ally', function () {
-        var core = new Core(ally_formation, enemy_formation, unit_width, distance_x, distance_y, ctx, randomnr);
-        expect(core.y_ally).toEqual( [] );
-        core.initiate();
-        expect(core.y_ally).toEqual( [1] );
-    });
-
-    it('tests initiate function to return correct y_enemy', function () {
-        var core = new Core(ally_formation, enemy_formation, unit_width, distance_x, distance_y, ctx, randomnr);
-        expect(core.y_enemy).toEqual( [] );
-        core.initiate();
-        expect(core.y_enemy).toEqual( [1] );
-    });
-
     it('tests initiate function to return correct ally', function () {
         var core = new Core(ally_formation, enemy_formation, unit_width, distance_x, distance_y, ctx, randomnr);
         expect(core.ally).toEqual( {} );

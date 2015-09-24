@@ -9,7 +9,6 @@ iteration.factory('iteration', ['helper', function (Helper) {
     Iteration.prototype.calculate_units = function() {
 
         var new_positions = { ally: {},        enemy: {}         };
-        var y_array =       { ally: [],        enemy: []         };
         var numbers =       { ally: 0,         enemy: 0          };
         var group =         { ally: this.ally, enemy: this.enemy };
         var x_array =       { ally: [],        enemy: []         };
@@ -35,7 +34,6 @@ iteration.factory('iteration', ['helper', function (Helper) {
                         }
                         unit.draw(self.ctx, self.unit_width);
                         if (!_.has(new_positions[type], unit['y'])) {
-                            y_array[type].push(unit['y']);
                             x_array[type][unit['y']] = [];
                             x_array[type][unit['y']].unshift([unit['x']]);
                             new_positions[type][unit['y']] = {};
@@ -51,8 +49,6 @@ iteration.factory('iteration', ['helper', function (Helper) {
 
         this.ally       = new_positions['ally'];
         this.enemy      = new_positions['enemy'];
-        this.y_ally     = y_array['ally'];
-        this.y_enemy    = y_array['enemy'];
         this.x_ally     = x_array['ally'];
         this.x_enemy    = x_array['enemy'];
         this.countAlly  = numbers['ally'];
