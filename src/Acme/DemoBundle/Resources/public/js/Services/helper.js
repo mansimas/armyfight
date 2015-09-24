@@ -56,7 +56,7 @@ helper.factory('helper', function () {
                 if (_.has(this.enemy, y)) {
                     return y;
                 }
-                for (var i = 1; i < 100; i++) {
+                for (var i = 1; i < 300; i++) {
                     i = parseInt(i);
                     if (_.has(this.enemy, parseInt(y) + i)) return y + i;
                     if (_.has(this.enemy, parseInt(y) - i)) return y - i;
@@ -67,7 +67,7 @@ helper.factory('helper', function () {
                 if (_.has(this.ally, y)) {
                     return y;
                 }
-                for (i = 1; i < 100; i++) {
+                for (i = 1; i < 300; i++) {
                     i = parseInt(i);
                     if (_.has(this.ally, parseInt(y) + i)) return y + i;
                     if (_.has(this.ally, parseInt(y) - i)) return y - i;

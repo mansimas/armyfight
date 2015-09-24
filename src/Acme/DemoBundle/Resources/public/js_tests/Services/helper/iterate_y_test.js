@@ -60,15 +60,15 @@ describe('iterate_Y function test', function() {
     it('tests iterate_y when ally looks for enemy when ally is too far away left', function () {
         var core = new Core(ally_formation, enemy_formation, unit_width, distance_x, distance_y, ctx, randomnr);
         core.initiate();
-        var found_y = core.iterate_Y(-150, 'ally');
-        expect(found_y).toEqual(-150);
+        var found_y = core.iterate_Y(-350, 'ally');
+        expect(found_y).toEqual(-350);
     });
 
     it('tests iterate_y when ally looks for enemy when ally is too far away right', function () {
         var core = new Core(ally_formation, enemy_formation, unit_width, distance_x, distance_y, ctx, randomnr);
         core.initiate();
-        var found_y = core.iterate_Y(150, 'ally');
-        expect(found_y).toEqual(150);
+        var found_y = core.iterate_Y(350, 'ally');
+        expect(found_y).toEqual(350);
     });
 
     it('tests iterate_y when enemy looks for ally at simplest example', function () {
@@ -109,14 +109,14 @@ describe('iterate_Y function test', function() {
     it('tests iterate_y when enemy looks for ally when enemy is too far away right', function () {
         var core = new Core(ally_formation, enemy_formation, unit_width, distance_x, distance_y, ctx, randomnr);
         core.initiate();
-        var found_y = core.iterate_Y(-150, 'enemy');
-        expect(found_y).toEqual(-150);
+        var found_y = core.iterate_Y(-350, 'enemy');
+        expect(found_y).toEqual(-350);
     });
 
     it('tests iterate_y when enemy looks for ally when enemy is too far away left', function () {
         var core = new Core(ally_formation, enemy_formation, unit_width, distance_x, distance_y, ctx, randomnr);
         core.initiate();
-        var found_y = core.iterate_Y(150, 'enemy');
-        expect(found_y).toEqual(150);
+        var found_y = core.iterate_Y(350, 'enemy');
+        expect(found_y).toEqual(350);
     });
 });
