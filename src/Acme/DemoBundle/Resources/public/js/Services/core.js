@@ -53,7 +53,7 @@ core.factory('core', ['units', 'iteration', function (Unit, Iteration) {
                 this.x_enemy[y] = [];
                 columns = {};
                 for (x = this.enemy_formation[row]['x']; x < this.enemy_formation[row]['column'] + this.enemy_formation[row]['x']; x++) {
-                    this.x_enemy[y].push(x * this.distance_x);
+                    this.x_enemy[y].unshift(x * this.distance_x);
                     columns[x * this.distance_x] = new Unit(
                         x * this.distance_x,
                         y,

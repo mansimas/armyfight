@@ -18,8 +18,8 @@ iteration.factory('iteration', ['helper', function (Helper) {
         _.each(['ally', 'enemy'], function(type) {
             _.each(group[type], function (val, y) {
                 y = parseInt(y);
-                    y_array[type].push(y);
-                    x_array[type][y] =[];
+                y_array[type].push(y);
+                x_array[type][y] =[];
                 var closest_y = self.iterate_Y(y, type);
                 _.each(val, function (unit, x) {
                     x = parseInt(x);

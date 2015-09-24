@@ -23,8 +23,19 @@ helper.factory('helper', function () {
 
     Helper.prototype.iterate_backwards_X = function(y, x, units) {
         y = String(y);
-        if(units == 'ally')  return _.find(this.enemy[y], function (v, k) { return parseInt(k) <= x });
+        var self = this;
         if(units == 'enemy') return _.find(this.ally[y],  function (v, k) { return parseInt(k) >= x });
+        if(units == 'ally') {
+            var selected;
+            for (var i = 0; i < self.x_enemy[y].length; i++) {
+                if (self.x_enemy[y][i] <= x) {
+                    var found = self.x_enemy[y][i];
+                    selected = self.enemy[y][found];
+                    break;
+                }
+            }
+            return selected;
+        }
     };
 
     Helper.prototype.iterate_Y = function(y, units) {
